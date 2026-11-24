@@ -190,6 +190,13 @@ final class SidebarGlassSetting: @unchecked Sendable {
     var isOn = false
 }
 
+/// Settings ▸ Tabs ▸ "Compact tabs" (Discussions #637): the windows' refresh copies it from the
+/// store, and the tab lists lay their rows out again when it changes.
+enum SidebarDensitySetting {
+    /// Written on the main thread only.
+    nonisolated(unsafe) static var current: SidebarDensity = .arc
+}
+
 /// The app's light or dark appearance, which an Auto space theme follows (Arc: appearanceBased):
 /// macOS', unless View ▸ Appearance sets NSApp.appearance to Light or Dark, as Arc's does (#362).
 @Observable
@@ -525,9 +532,11 @@ final class PagedGradientView: NSView {
 /// Layout constants measured from Arc 1.168 at 2x (see docs).
 enum CraMetrics {
     static let sidebarDefaultWidth: CGFloat = 328
-    static let rowHeight: CGFloat = 40
-    static let rowSpacing: CGFloat = 1
-    static let rowCorner: CGFloat = 10
+    /// Arc's 40 pt row, 1 pt apart, with a 10 pt corner; Settings ▸ Tabs ▸ "Compact tabs"
+    /// (Discussions #637, SidebarDensity) closes them up.
+    static var rowHeight: CGFloat { SidebarDensitySetting.current.rowHeight }
+    static var rowSpacing: CGFloat { SidebarDensitySetting.current.rowSpacing }
+    static var rowCorner: CGFloat { SidebarDensitySetting.current.rowCorner }
     static let favicon: CGFloat = 16
     /// A nested row's step in (Arc 1.171, measured at 1x: favicon 26 → 42, text 45 → 61; GitHub #139).
     static let indent: CGFloat = 16

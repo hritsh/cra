@@ -12,11 +12,17 @@ public struct FavoritesLayout: Equatable {
 
     public let count: Int
     public let width: CGFloat
+    /// Compact (Discussions #637) makes the tiles shorter, not narrower: the columns stay Arc's.
+    public let density: SidebarDensity
 
-    public init(count: Int, width: CGFloat) {
+    public init(count: Int, width: CGFloat, density: SidebarDensity = .arc) {
         self.count = count
         self.width = width
+        self.density = density
     }
+
+    /// A tile's height: Arc's 47, compact's 36 (Yab's Compact takes its pins from 45 to 34).
+    public var rowHeight: CGFloat { density == .compact ? 36 : Self.tileHeight }
 
     public var columns: Int {
         let widest = (1...4).last { (width - CGFloat($0 - 1) * Self.gap) / CGFloat($0) >= Self.tileHeight } ?? 1
@@ -31,7 +37,7 @@ public struct FavoritesLayout: Equatable {
 
     /// The tiles' height, 0 with no favorites.
     public var gridHeight: CGFloat {
-        rows == 0 ? 0 : CGFloat(rows) * Self.tileHeight + CGFloat(rows - 1) * Self.gap
+        rows == 0 ? 0 : CGFloat(rows) * rowHeight + CGFloat(rows - 1) * Self.gap
     }
 
     public func frame(at index: Int) -> CGRect {
@@ -39,7 +45,7 @@ public struct FavoritesLayout: Equatable {
         let r = index / n, c = index % n
         // Arc puts each tile on a half point (84.75 → 85 at 347 pt).
         let x = (CGFloat(c) * (cw + Self.gap) * 2).rounded() / 2
-        return CGRect(x: x, y: CGFloat(r) * (Self.tileHeight + Self.gap), width: cw, height: Self.tileHeight)
+        return CGRect(x: x, y: CGFloat(r) * (rowHeight + Self.gap), width: cw, height: rowHeight)
     }
 
     /// The slot a tile dragged over the grid would land in: the one under `point`, a gap going to
@@ -47,7 +53,7 @@ public struct FavoritesLayout: Equatable {
     /// open slot among its tiles.
     public func slot(at point: CGPoint) -> Int {
         guard count > 0 else { return 0 }
-        let row = min(max(Int(((point.y + Self.gap / 2) / (Self.tileHeight + Self.gap)).rounded(.down)), 0), rows - 1)
+        let row = min(max(Int(((point.y + Self.gap / 2) / (rowHeight + Self.gap)).rounded(.down)), 0), rows - 1)
         let column = min(max(Int(((point.x + Self.gap / 2) / (tileWidth + Self.gap)).rounded(.down)), 0), columns - 1)
         return min(row * columns + column, count - 1)
     }

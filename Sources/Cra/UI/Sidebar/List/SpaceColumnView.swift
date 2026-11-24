@@ -611,6 +611,17 @@ enum MenuItems {
 /// every space has its own. While the toolbar is hidden the profile's pinned extensions sit
 /// over the tiles in a grid of their own (PinnedExtensionGrid), as in Arc.
 final class FavoritesGridView: NSView {
+    private static let all = NSHashTable<FavoritesGridView>.weakObjects()
+
+    /// Settings ▸ Tabs ▸ "Compact tabs" changed (Discussions #637): the tiles take their new
+    /// height, and the column moves the list under them.
+    static func densityChanged() {
+        for g in all.allObjects {
+            g.needsLayout = true
+            g.onHeightChange(false)
+        }
+    }
+
     private let spaceID: UUID
     let store: SidebarStore
     let ui: SidebarUIState
@@ -650,6 +661,7 @@ final class FavoritesGridView: NSView {
         self.actions = actions
         self.favicons = favicons
         super.init(frame: .zero)
+        Self.all.add(self)
         strip.onDrop = { [weak self] id in
             guard let self else { return false }
             self.store.addToFavorites(id, in: self.spaceID)
@@ -843,7 +855,7 @@ final class FavoritesGridView: NSView {
 
     /// Arc's columns and tile frames (FavoritesLayout, #29). A drag over the tiles counts the slot
     /// it holds open, so a tab brought in from the list can add a row.
-    private func grid(forWidth w: CGFloat) -> FavoritesLayout { FavoritesLayout(count: slotCount(drop), width: w) }
+    private func grid(forWidth w: CGFloat) -> FavoritesLayout { FavoritesLayout(count: slotCount(drop), width: w, density: SidebarDensitySetting.current) }
 
     /// The tiles that keep a place of their own: all but the one being dragged over the grid.
     private func restingOrder(_ drop: Drop?) -> [UUID] { drop.map { d in order.filter { $0 != d.id } } ?? order }
@@ -926,7 +938,7 @@ final class FavoritesGridView: NSView {
             placeTiles(grid, top: extensionGrid(forWidth: w).favoritesOffset, animated: true)
         }
         // A tab from the list can open a row, and leaving gives it back.
-        if grid.rows != FavoritesLayout(count: slotCount(old), width: w).rows { onHeightChange(true) }
+        if grid.rows != FavoritesLayout(count: slotCount(old), width: w, density: SidebarDensitySetting.current).rows { onHeightChange(true) }
     }
 
     // MARK: Drops (#176)
@@ -944,7 +956,7 @@ final class FavoritesGridView: NSView {
         let p = convert(info.draggingLocation, from: nil)
         // The pinned extensions over the tiles take nothing.
         guard p.y >= top - FavoritesLayout.gap / 2 else { return nil }
-        let grid = FavoritesLayout(count: order.filter { $0 != id }.count + 1, width: w)
+        let grid = FavoritesLayout(count: order.filter { $0 != id }.count + 1, width: w, density: SidebarDensitySetting.current)
         return Drop(id: id, slot: grid.slot(at: CGPoint(x: p.x, y: p.y - top)))
     }
 

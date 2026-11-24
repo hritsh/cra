@@ -167,6 +167,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, BrowserM
 
         let store = app.store
         SidebarGlassSetting.shared.isOn = store.settings.translucentSidebar
+        SidebarDensitySetting.current = store.settings.sidebarDensity
         let palette = focusedSpace.theme.palette
         let statusBubble = StatusBubbleView(overlay: overlay)
         self.statusBubble = statusBubble
@@ -657,6 +658,11 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, BrowserM
         let space = focusedSpace
         // Every palette reads the setting; the store's change reaches the windows here (SidebarGlassSetting).
         if SidebarGlassSetting.shared.isOn != store.settings.translucentSidebar { SidebarGlassSetting.shared.isOn = store.settings.translucentSidebar }
+        if SidebarDensitySetting.current != store.settings.sidebarDensity {
+            SidebarDensitySetting.current = store.settings.sidebarDensity
+            SpaceListView.densityChanged()
+            FavoritesGridView.densityChanged()
+        }
         let palette = space.theme.palette
         // Its extensions belong to the space's profile.
         if siteControlCenter.isShown, siteControlCenterSpaceID != space.id { siteControlCenter.close() }

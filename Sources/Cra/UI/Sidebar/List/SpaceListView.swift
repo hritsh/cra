@@ -135,6 +135,17 @@ final class SpaceListView: NSView, NSDraggingSource {
         for l in all.allObjects where l.ui === ui { l.hoverAt(nil) }
     }
 
+    /// Settings ▸ Tabs ▸ "Compact tabs" changed (Discussions #637): every list lays its rows out
+    /// again and draws them afresh, since a row keeps the corner it was made with.
+    static func densityChanged() {
+        for l in all.allObjects {
+            l.views.values.forEach(l.retire)
+            l.views = [:]
+            l.laidOutWidth = -1
+            l.relayoutIfResized()
+        }
+    }
+
     static func refreshHover(for ui: SidebarUIState) {
         for l in all.allObjects where l.ui === ui { l.refreshHover() }
     }

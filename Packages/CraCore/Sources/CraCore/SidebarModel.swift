@@ -769,6 +769,8 @@ public struct AppSettings: Codable, Equatable {
     public var translucentSidebar: Bool = false
     /// Ideas #366, not in Arc: the now-playing cards' colour (NowPlayingTint). Arc's by default.
     public var nowPlayingTint: NowPlayingTint = .arc
+    /// Discussions #637, not in Arc: the sidebar's rows closer together (SidebarDensity). Arc's by default.
+    public var sidebarDensity: SidebarDensity = .arc
     /// GitHub #464, not in Arc: the sidebar docks on the window's right (SidebarSide). Left is Arc's.
     public var sidebarSide: SidebarSide = .left
     /// GitHub #91, Settings ▸ Performance: Cra records its own performance on this Mac (stalls,
@@ -1092,6 +1094,7 @@ extension AppSettings {
         pageMargin = (try? c.decodeIfPresent(Double.self, forKey: .pageMargin)) ?? PageMargin.arc
         translucentSidebar = try c.decodeIfPresent(Bool.self, forKey: .translucentSidebar) ?? false
         nowPlayingTint = (try? c.decodeIfPresent(NowPlayingTint.self, forKey: .nowPlayingTint)) ?? .arc
+        sidebarDensity = (try? c.decodeIfPresent(SidebarDensity.self, forKey: .sidebarDensity)) ?? .arc
         sidebarSide = (try? c.decodeIfPresent(SidebarSide.self, forKey: .sidebarSide)) ?? .left
         perfRecording = try c.decodeIfPresent(Bool.self, forKey: .perfRecording) ?? Self.perfRecordingDefault
         perfHidesSiteNames = try c.decodeIfPresent(Bool.self, forKey: .perfHidesSiteNames) ?? false

@@ -45,6 +45,21 @@ extension SettingsArt {
         }
     }
 
+    /// Discussions #637: the tabs closer together, more of them in the same sidebar.
+    static var compactTabs: some View {
+        let t = ArtTint.mint
+        let rows: [(Color, CGFloat)] = [(blue, 0.7), (red, 0.5), (yellow, 0.8), (green, 0.45), (purple, 0.65), (blue, 0.55)]
+        return ArtCanvas(tint: t) {
+            ArtSidebar(tint: t) {
+                ArtTabRow(favicon: green, title: 0.6, selected: true, height: 7)
+                ForEach(rows.indices, id: \.self) { i in
+                    ArtTabRow(favicon: rows[i].0, title: rows[i].1, height: 6)
+                }
+            }
+            .at(18, 3)
+        }
+    }
+
     /// The open favorite's rim in its logo's colours.
     static var favoriteLogoOutline: some View {
         let t = ArtTint.lemon

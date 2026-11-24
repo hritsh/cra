@@ -44,6 +44,12 @@ struct TabsPane: View {
                                   detail: "The + New Tab row sits at the top of the tab list, where you can always reach it.",
                                   isOn: $store.settings.newTabButtonAtTop) { SettingsArt.newTabButtonAtTop }
                 SettingsCardDivider()
+                // Discussions #637, not in Arc: the sidebar's rows closer together (SidebarDensity).
+                SettingsSwitchRow("Compact tabs",
+                                  detail: "Tabs and folders sit closer together, so more of them fit before the sidebar scrolls.",
+                                  isOn: Binding(get: { store.settings.sidebarDensity == .compact },
+                                                set: { store.settings.sidebarDensity = $0 ? .compact : .arc })) { SettingsArt.compactTabs }
+                SettingsCardDivider()
                 SettingsSwitchRow("Colorful favorite outline",
                                   detail: "The open favorite gets a rim in its logo’s colors instead of a plain one.",
                                   isOn: $store.settings.favoriteLogoOutline) { SettingsArt.favoriteLogoOutline }

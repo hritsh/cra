@@ -158,6 +158,7 @@ struct ArtTabRow: View {
     var selected = false
     var symbol: String?
     var ink: Color = .black
+    var height: CGFloat = 9
 
     var body: some View {
         HStack(spacing: 3) {
@@ -169,7 +170,7 @@ struct ArtTabRow: View {
             Capsule().fill(Color.black.opacity(selected ? 0.35 : 0.22)).frame(width: (width - 14) * title, height: 2.2)
         }
         .padding(.horizontal, 3)
-        .frame(width: width, height: 9, alignment: .leading)
+        .frame(width: width, height: height, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 2.5, style: .continuous).fill(selected ? Color.white : Color.white.opacity(0.001)))
         .artLiftIf(selected)
     }
